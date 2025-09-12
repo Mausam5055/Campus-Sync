@@ -6,7 +6,7 @@ This document outlines the complete frontend architecture for CampusSync, a mode
 
 ## 🏗️ Architecture
 
-### Technology Stack
+### Technology Stackk
 - **Framework**: React 18 with TypeScript
 - **Build Tool**: Vite
 - **Routing**: React Router v6

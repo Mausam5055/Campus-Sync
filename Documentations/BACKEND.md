@@ -6,7 +6,7 @@ This document outlines a complete backend architecture for CampusSync, a panel-b
 
 ## 🏗️ Architecture
 
-### Technology Stack
+### Technology Stackk
 - **Framework**: Express.js
 - **Database**: MongoDB with Mongoose ODM
 - **Authentication**: JWT (JSON Web Tokens)
