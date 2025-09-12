@@ -1,0 +1,310 @@
+\chapter{System Architecture}
+
+\section{Architecture Overview}
+
+Campus-Sync follows a modern, scalable architecture designed to support a panel-based educational management platform. The system is built using a client-server model with a React frontend and Supabase backend, providing a seamless user experience across all roles.
+
+The architecture is organized around three primary user panels (Student, Teacher, and Admin) with shared services that facilitate communication and data exchange between these panels. This design ensures that each user type has access to role-specific features while maintaining a consistent and integrated platform experience.
+
+\section{High-Level Architecture}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[thick, node distance=2cm]
+        % Client Applications
+        \node (client) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=blue!10] {Client Applications};
+        
+        % Frontend Layer
+        \node (frontend) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=green!10, below=of client] {Frontend Layer};
+        
+        % API Layer
+        \node (api) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=orange!10, below=of frontend] {API Layer};
+        
+        % Database Layer
+        \node (database) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=red!10, below=of api] {Database Layer};
+        
+        % External Services
+        \node (external) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=purple!10, below=of database] {External Services};
+        
+        % Arrows
+        \draw[->] (client) -- (frontend);
+        \draw[->] (frontend) -- (api);
+        \draw[->] (api) -- (database);
+        \draw[->] (api) -- (external);
+        
+        % Subcomponents
+        \node (web) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=blue!20, left=of client, xshift=-2cm] {Web Browser};
+        \node (mobile) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=blue!20, right=of client, xshift=2cm] {Mobile Web};
+        
+        \node (react) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=green!20, left=of frontend, xshift=-2cm] {React/Vite};
+        \node (components) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=green!20, right=of frontend, xshift=2cm] {Components};
+        
+        \node (supabase) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=orange!20, left=of api, xshift=-2cm] {Supabase};
+        \node (workflows) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=orange!20, right=of api, xshift=2cm] {n8n Workflows};
+        
+        \node (postgres) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=red!20, left=of database, xshift=-2cm] {PostgreSQL};
+        \node (redis) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=red!20, right=of database, xshift=2cm] {Redis Cache};
+        
+        \node (email) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=purple!20, left=of external, xshift=-2cm] {Email};
+        \node (sms) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=purple!20, right=of external, xshift=2cm] {SMS};
+        
+        % Subcomponent arrows
+        \draw[->] (web) -- (client);
+        \draw[->] (mobile) -- (client);
+        \draw[->] (react) -- (frontend);
+        \draw[->] (components) -- (frontend);
+        \draw[->] (supabase) -- (api);
+        \draw[->] (workflows) -- (api);
+        \draw[->] (postgres) -- (database);
+        \draw[->] (redis) -- (database);
+        \draw[->] (email) -- (external);
+        \draw[->] (sms) -- (external);
+    \end{tikzpicture}
+    \caption{High-Level System Architecture}
+    \label{fig:high-level-architecture}
+\end{figure}
+
+\section{Panel-Based Architecture}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[thick, node distance=1.5cm]
+        % Main Platform
+        \node (platform) [draw, rectangle, minimum width=12cm, minimum height=8cm, fill=gray!10] {};
+        \node at (platform.north) [above=0.5cm, font=\bfseries] {Campus-Sync Platform};
+        
+        % Admin Panel
+        \node (admin) [draw, rectangle, minimum width=3cm, minimum height=6cm, fill=blue!10, below=of platform.north west, yshift=-1cm, xshift=2cm] {Admin Panel};
+        
+        % Teacher Panel
+        \node (teacher) [draw, rectangle, minimum width=3cm, minimum height=6cm, fill=green!10, right=of admin, xshift=1cm] {Teacher Panel};
+        
+        % Student Panel
+        \node (student) [draw, rectangle, minimum width=3cm, minimum height=6cm, fill=orange!10, right=of teacher, xshift=1cm] {Student Panel};
+        
+        % Shared Services
+        \node (shared) [draw, rectangle, minimum width=12cm, minimum height=1.5cm, fill=purple!10, below=of admin, yshift=-1cm] {Shared Services};
+        
+        % Admin Components
+        \node (admindash) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=blue!20, below=of admin.north, yshift=-0.5cm] {Dashboard};
+        \node (usermgmt) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=blue!20, below=of admindash, yshift=-0.2cm] {User Mgmt};
+        \node (courseplan) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=blue!20, below=of usermgmt, yshift=-0.2cm] {Course Planning};
+        \node (billing) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=blue!20, below=of courseplan, yshift=-0.2cm] {Billing};
+        \node (reports) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=blue!20, below=of billing, yshift=-0.2cm] {Reports};
+        
+        % Teacher Components
+        \node (teacherdash) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=green!20, below=of teacher.north, yshift=-0.5cm] {Dashboard};
+        \node (classmgmt) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=green!20, below=of teacherdash, yshift=-0.2cm] {Class Mgmt};
+        \node (assignments) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=green!20, below=of classmgmt, yshift=-0.2cm] {Assignments};
+        \node (grades) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=green!20, below=of assignments, yshift=-0.2cm] {Grades};
+        \node (attendance) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=green!20, below=of grades, yshift=-0.2cm] {Attendance};
+        
+        % Student Components
+        \node (studentdash) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=orange!20, below=of student.north, yshift=-0.5cm] {Dashboard};
+        \node (courses) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=orange!20, below=of studentdash, yshift=-0.2cm] {Courses};
+        \node (studentassign) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=orange!20, below=of courses, yshift=-0.2cm] {Assignments};
+        \node (studentgrades) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=orange!20, below=of studentassign, yshift=-0.2cm] {Grades};
+        \node (studentattend) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=orange!20, below=of studentgrades, yshift=-0.2cm] {Attendance};
+        
+        % Shared Services Components
+        \node (auth) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=purple!20, below=of shared.north west, yshift=-0.3cm, xshift=1.5cm] {Authentication};
+        \node (notifications) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=purple!20, right=of auth, xshift=0.5cm] {Notifications};
+        \node (storage) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=purple!20, right=of notifications, xshift=0.5cm] {File Storage};
+        \node (dataaccess) [draw, rectangle, minimum width=2.5cm, minimum height=0.7cm, fill=purple!20, right=of storage, xshift=0.5cm] {Data Access};
+        
+        % Arrows
+        \draw[->] (admin) -- (shared);
+        \draw[->] (teacher) -- (shared);
+        \draw[->] (student) -- (shared);
+    \end{tikzpicture}
+    \caption{Panel-Based System Architecture}
+    \label{fig:panel-architecture}
+\end{figure}
+
+\section{Frontend Architecture}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[thick, node distance=1.5cm]
+        % App Component
+        \node (app) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=blue!10] {App.tsx};
+        
+        % Providers
+        \node (providers) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=green!10, below=of app] {Providers};
+        
+        % Router
+        \node (router) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=orange!10, below=of providers] {Router};
+        
+        % Layout Components
+        \node (layout) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=red!10, below=of router] {Layout Components};
+        
+        % Page Components
+        \node (pages) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=purple!10, below=of layout] {Page Components};
+        
+        % Feature Components
+        \node (features) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=cyan!10, below=of pages] {Feature Components};
+        
+        % Arrows
+        \draw[->] (app) -- (providers);
+        \draw[->] (providers) -- (router);
+        \draw[->] (router) -- (layout);
+        \draw[->] (layout) -- (pages);
+        \draw[->] (pages) -- (features);
+        
+        % Subcomponents
+        \node (theme) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=green!20, left=of providers, xshift=-2.5cm] {ThemeProvider};
+        \node (auth) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=green!20, right=of providers, xshift=2.5cm] {AuthProvider};
+        
+        \node (approutes) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=orange!20, left=of router, xshift=-2.5cm] {AppRoutes};
+        \node (protected) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=orange!20, right=of router, xshift=2.5cm] {ProtectedRoutes};
+        
+        \node (applayout) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=red!20, left=of layout, xshift=-2.5cm] {AppLayout};
+        \node (sidebar) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=red!20, right=of layout, xshift=2.5cm] {Sidebar};
+        
+        \node (dashpages) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=purple!20, left=of pages, xshift=-2.5cm] {Dashboard Pages};
+        \node (mgmtpages) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=purple!20, right=of pages, xshift=2.5cm] {Management Pages};
+        
+        \node (uicomponents) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=cyan!20, left=of features, xshift=-2.5cm] {UI Components};
+        \node (formcomponents) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=cyan!20, right=of features, xshift=2.5cm] {Form Components};
+        
+        % Subcomponent arrows
+        \draw[->] (theme) -- (providers);
+        \draw[->] (auth) -- (providers);
+        \draw[->] (approutes) -- (router);
+        \draw[->] (protected) -- (router);
+        \draw[->] (applayout) -- (layout);
+        \draw[->] (sidebar) -- (layout);
+        \draw[->] (dashpages) -- (pages);
+        \draw[->] (mgmtpages) -- (pages);
+        \draw[->] (uicomponents) -- (features);
+        \draw[->] (formcomponents) -- (features);
+    \end{tikzpicture}
+    \caption{Frontend Component Hierarchy}
+    \label{fig:frontend-hierarchy}
+\end{figure}
+
+\section{Backend Architecture}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[thick, node distance=1.5cm]
+        % API Gateway
+        \node (api) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=blue!10] {API Gateway};
+        
+        % Middleware
+        \node (middleware) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=green!10, below=of api] {Middleware};
+        
+        % Controllers
+        \node (controllers) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=orange!10, below=of middleware] {Controllers};
+        
+        % Services
+        \node (services) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=red!10, below=of controllers] {Services};
+        
+        % Models
+        \node (models) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=purple!10, below=of services] {Models};
+        
+        % Database
+        \node (database) [draw, rectangle, minimum width=3cm, minimum height=1cm, fill=cyan!10, below=of models] {Database};
+        
+        % Arrows
+        \draw[->] (api) -- (middleware);
+        \draw[->] (middleware) -- (controllers);
+        \draw[->] (controllers) -- (services);
+        \draw[->] (services) -- (models);
+        \draw[->] (models) -- (database);
+        
+        % Subcomponents
+        \node (authjwt) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=green!20, left=of middleware, xshift=-2.5cm] {Auth JWT};
+        \node (validation) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=green!20, right=of middleware, xshift=2.5cm] {Validation};
+        
+        \node (userctrl) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=orange!20, left=of controllers, xshift=-2.5cm] {User Ctrl};
+        \node (coursectrl) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=orange!20, right=of controllers, xshift=2.5cm] {Course Ctrl};
+        
+        \node (usersvc) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=red!20, left=of services, xshift=-2.5cm] {User Svc};
+        \node (coursesvc) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=red!20, right=of services, xshift=2.5cm] {Course Svc};
+        
+        \node (usermodel) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=purple!20, left=of models, xshift=-2.5cm] {User Model};
+        \node (coursemodel) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=purple!20, right=of models, xshift=2.5cm] {Course Model};
+        
+        \node (postgres) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=cyan!20, left=of database, xshift=-2.5cm] {PostgreSQL};
+        \node (redis) [draw, rectangle, minimum width=2cm, minimum height=0.7cm, fill=cyan!20, right=of database, xshift=2.5cm] {Redis};
+        
+        % Subcomponent arrows
+        \draw[->] (authjwt) -- (middleware);
+        \draw[->] (validation) -- (middleware);
+        \draw[->] (userctrl) -- (controllers);
+        \draw[->] (coursectrl) -- (controllers);
+        \draw[->] (usersvc) -- (services);
+        \draw[->] (coursesvc) -- (services);
+        \draw[->] (usermodel) -- (models);
+        \draw[->] (coursemodel) -- (models);
+        \draw[->] (postgres) -- (database);
+        \draw[->] (redis) -- (database);
+    \end{tikzpicture}
+    \caption{Backend Architecture Layers}
+    \label{fig:backend-architecture}
+\end{figure}
+
+\section{Data Flow Patterns}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[thick, node distance=2cm]
+        % Components
+        \node (client) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=blue!10] {Client};
+        \node (middleware) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=green!10, right=of client] {Middleware};
+        \node (controller) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=orange!10, right=of middleware] {Controller};
+        \node (service) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=red!10, right=of controller] {Service};
+        \node (model) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=purple!10, right=of service] {Model};
+        \node (database) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=cyan!10, right=of model] {Database};
+        
+        % Response path
+        \node (response) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=yellow!10, below=of service, yshift=-1cm] {Response};
+        \node (ui) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=gray!10, below=of client, yshift=-1cm] {UI Update};
+        
+        % Arrows
+        \draw[->] (client) -- (middleware) node[midway, above] {1. Request};
+        \draw[->] (middleware) -- (controller) node[midway, above] {2. Process};
+        \draw[->] (controller) -- (service) node[midway, above] {3. Data};
+        \draw[->] (service) -- (model) node[midway, above] {4. Query/Update};
+        \draw[->] (model) -- (database) node[midway, above] {5. Persist};
+        \draw[->] (database) -- (model) node[midway, below] {6. Return};
+        \draw[->] (model) -- (service) node[midway, below] {7. Data};
+        \draw[->] (service) -- (response) node[midway, right] {8. Response};
+        \draw[->] (response) -- (ui) node[midway, above] {9. UI Update};
+        \draw[->] (ui) -- (client) node[midway, below] {10. Update};
+    \end{tikzpicture}
+    \caption{Data Flow Pattern}
+    \label{fig:data-flow}
+\end{figure}
+
+\section{Security Architecture}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[thick, node distance=2cm]
+        % Components
+        \node (user) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=blue!10] {User Request};
+        \node (jwt) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=green!10, right=of user] {JWT Validation};
+        \node (role) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=orange!10, right=of jwt] {Role Check};
+        \node (permission) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=red!10, right=of role] {Permission Check};
+        \node (resource) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, fill=purple!10, right=of permission] {Resource Access};
+        
+        % Arrows
+        \draw[->] (user) -- (jwt) node[midway, above] {1};
+        \draw[->] (jwt) -- (role) node[midway, above] {2};
+        \draw[->] (role) -- (permission) node[midway, above] {3};
+        \draw[->] (permission) -- (resource) node[midway, above] {4};
+        
+        % Layers
+        \node[draw, rectangle, minimum width=6cm, minimum height=2cm, fill=green!5, fit=(user) (jwt), inner sep=0.5cm] {};
+        \node at (jwt.north -| user) [above=0.3cm, font=\bfseries] {Auth Layer};
+        
+        \node[draw, rectangle, minimum width=6cm, minimum height=2cm, fill=purple!5, fit=(role) (resource), inner sep=0.5cm] {};
+        \node at (resource.north -| role) [above=0.3cm, font=\bfseries] {Access Control};
+    \end{tikzpicture}
+    \caption{Security Architecture Flow}
+    \label{fig:security-flow}
+\end{figure}
+
+This architecture provides a solid foundation for the Campus-Sync platform, ensuring scalability, maintainability, and security across all components.

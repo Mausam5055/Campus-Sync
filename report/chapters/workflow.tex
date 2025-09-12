@@ -1,0 +1,263 @@
+\chapter{System Workflows and Data Flow}
+
+\section{Authentication Workflow}
+
+The authentication process is a critical component of the Campus-Sync platform, ensuring secure access while providing a seamless user experience.
+
+\subsection{User Login Process}
+
+\begin{enumerate}
+    \item User navigates to the authentication page
+    \item User enters credentials (email and password)
+    \item Frontend validates input format
+    \item Credentials are sent to the backend authentication API
+    \item Backend validates credentials against the database
+    \item Upon successful validation, JWT tokens are generated
+    \item Tokens are returned to the frontend
+    \item Frontend stores tokens in secure storage
+    \item User is redirected to their role-specific dashboard
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[thick, node distance=2.5cm, every node/.style={align=center, font=\small}]
+        \node (user) [draw, rectangle, minimum width=2.5cm, minimum height=1cm] {User};
+        \node (frontend) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, right=of user] {Frontend};
+        \node (backend) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, right=of frontend] {Backend};
+        \node (database) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, right=of backend] {Database};
+        
+        \draw[->] (user) -- (frontend) node[midway, above, font=\scriptsize, yshift=0.3cm] {1. Enter\\credentials};
+        \draw[->] (frontend) -- (backend) node[midway, above, font=\scriptsize, yshift=0.3cm] {2. Submit auth\\request};
+        \draw[->] (backend) -- (database) node[midway, above, font=\scriptsize, yshift=0.3cm] {3. Validate\\credentials};
+        \draw[->] (database) -- (backend) node[midway, above, font=\scriptsize, yshift=0.3cm] {4. User\\data};
+        \draw[->] (backend) -- (frontend) node[midway, above, font=\scriptsize, yshift=0.3cm] {5. JWT\\tokens};
+        \draw[->] (frontend) -- (user) node[midway, above, font=\scriptsize, yshift=0.3cm] {6. Redirect to\\dashboard};
+    \end{tikzpicture}
+    \caption{Authentication Flow}
+    \label{fig:auth-flow}
+\end{figure}
+
+\subsection{Token Management}
+
+\begin{itemize}
+    \item Access tokens with 15-minute expiry for security
+    \item Refresh tokens with 7-day expiry for convenience
+    \item Automatic token refresh before expiry
+    \item Secure storage of tokens in HTTP-only cookies
+\end{itemize}
+
+\section{Assignment Management Workflow}
+
+The assignment management system facilitates the creation, distribution, and evaluation of academic assignments.
+
+\subsection{Assignment Creation Process}
+
+\begin{enumerate}
+    \item Teacher navigates to assignment creation interface
+    \item Teacher fills in assignment details (title, description, due date, etc.)
+    \item Teacher attaches any necessary files or resources
+    \item Teacher selects target course and students
+    \item Assignment is saved to the database
+    \item Notifications are sent to relevant students
+    \item Assignment appears in students' assignment lists
+\end{enumerate}
+
+\subsection{Assignment Submission Process}
+
+\begin{enumerate}
+    \item Student views assignment in their assignment list
+    \item Student prepares submission (writes response, attaches files)
+    \item Student submits assignment through the platform
+    \item Submission is stored in the database
+    \item Teacher receives notification of new submission
+    \item Submission appears in teacher's evaluation queue
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \begin{tikzpicture}[thick, node distance=2.5cm, every node/.style={align=center, font=\small}]
+        \node (student) [draw, rectangle, minimum width=2.5cm, minimum height=1cm] {Student};
+        \node (frontend) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, right=of student] {Frontend};
+        \node (backend) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, right=of frontend] {Backend};
+        \node (database) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, right=of backend] {Database};
+        \node (teacher) [draw, rectangle, minimum width=2.5cm, minimum height=1cm, below=of frontend, yshift=-1.5cm] {Teacher};
+        
+        \draw[->] (student) -- (frontend) node[midway, above, font=\scriptsize, yshift=0.3cm] {1. Submit\\assignment};
+        \draw[->] (frontend) -- (backend) node[midway, above, font=\scriptsize, yshift=0.3cm] {2. Upload file\\+ metadata};
+        \draw[->] (backend) -- (database) node[midway, above, font=\scriptsize, yshift=0.3cm] {3. Store\\assignment data};
+        \draw[->] (database) -- (backend) node[midway, above, font=\scriptsize, yshift=0.3cm] {4.\\Confirmation};
+        \draw[->] (backend) -- (frontend) node[midway, above, font=\scriptsize, yshift=0.3cm] {5. Success\\response};
+        \draw[->] (frontend) -- (student) node[midway, above, font=\scriptsize, yshift=0.3cm] {6. Show\\confirmation};
+        \draw[->] (backend) -- (teacher) node[midway, right, font=\scriptsize, xshift=0.3cm] {7. Notification\\(async)};
+    \end{tikzpicture}
+    \caption{Assignment Submission Flow}
+    \label{fig:assignment-flow}
+\end{figure}
+
+\section{Grade Management Workflow}
+
+The grade management system provides teachers with tools to evaluate student performance and students with access to their academic progress.
+
+\subsection{Grade Entry Process}
+
+\begin{enumerate}
+    \item Teacher accesses grade entry interface
+    \item Teacher selects course and assignment/exam
+    \item Teacher enters grades for individual students
+    \item System validates grade format and range
+    \item Grades are saved to the database
+    \item Grade calculations are updated (averages, totals)
+    \item Students receive notifications of grade updates
+\end{enumerate}
+
+\subsection{Grade Viewing Process}
+
+\begin{enumerate}
+    \item Student navigates to grade viewing section
+    \item System retrieves student's grades from database
+    \item Grades are organized by course and term
+    \item Visual representations (charts, graphs) are generated
+    \item Student views grades and performance metrics
+\end{enumerate}
+
+\section{Attendance Tracking Workflow}
+
+The attendance system helps track student participation and engagement in classes.
+
+\subsection{Attendance Recording Process}
+
+\begin{enumerate}
+    \item Teacher opens attendance interface for a specific class
+    \item System displays enrolled students for that class
+    \item Teacher marks attendance status for each student
+    \item Attendance data is saved to the database
+    \item Attendance statistics are updated
+    \item Notifications may be sent for attendance concerns
+\end{enumerate}
+
+\subsection{Attendance Viewing Process}
+
+\begin{enumerate}
+    \item Student or admin accesses attendance records
+    \item System retrieves attendance data from database
+    \item Data is organized by course and date
+    \item Attendance percentages and trends are calculated
+    \item Visual reports are generated
+\end{enumerate}
+
+\section{Billing and Payment Workflow}
+
+The financial management system handles tuition, fees, and other monetary transactions.
+
+\subsection{Billing Process}
+
+\begin{enumerate}
+    \item Admin creates billing records for students
+    \item System calculates amounts based on course enrollment
+    \item Billing records are stored in the database
+    \item Invoices are generated and sent to students
+    \item Payment due dates are tracked
+\end{enumerate}
+
+\subsection{Payment Process}
+
+\begin{enumerate}
+    \item Student accesses billing and payment interface
+    \item Student views outstanding bills and due dates
+    \item Student selects payment method and amount
+    \item Payment information is processed securely
+    \item Payment confirmation is recorded in the database
+    \item Receipts are generated and sent to student
+\end{enumerate}
+
+\section{Communication Workflow}
+
+The communication system facilitates announcements, notifications, and messaging between users.
+
+\subsection{Announcement Creation Process}
+
+\begin{enumerate}
+    \item Admin or teacher creates an announcement
+    \item Announcement details are entered (title, content, audience)
+    \item Target audience is selected (all users, specific roles, etc.)
+    \item Announcement is saved to the database
+    \item Notifications are sent to target audience
+    \item Announcement appears in relevant users' feeds
+\end{enumerate}
+
+\subsection{Notification Delivery Process}
+
+\begin{enumerate}
+    \item System event triggers a notification
+    \item Notification is created and stored in database
+    \item Notification is formatted for delivery
+    \item Notification is sent via preferred channels (in-app, email, SMS)
+    \item User receives notification
+    \item User interaction with notification is tracked
+\end{enumerate}
+
+\section{Data Synchronization}
+
+Campus-Sync implements real-time data synchronization to ensure all users have access to the most current information.
+
+\subsection{Real-Time Updates}
+
+\begin{itemize}
+    \item WebSocket connections for live data updates
+    \item Database triggers for immediate change notifications
+    \item Client-side caching for improved performance
+    \item Conflict resolution for concurrent updates
+\end{itemize}
+
+\subsection{Offline Support}
+
+\begin{itemize}
+    \item Local data storage for offline access
+    \item Synchronization queue for offline actions
+    \item Conflict detection and resolution
+    \item Automatic sync when connectivity is restored
+\end{itemize}
+
+\section{Error Handling and Recovery}
+
+The system implements comprehensive error handling to ensure reliability and user experience.
+
+\subsection{Error Types}
+
+\begin{itemize}
+    \item Validation errors (input format issues)
+    \item Authentication errors (login failures)
+    \item Authorization errors (access denied)
+    \item Database errors (connection failures, query issues)
+    \item Server errors (500-level HTTP errors)
+    \item Network errors (connectivity issues)
+\end{itemize}
+
+\subsection{Error Response Format}
+
+\begin{lstlisting}[language=JSON, caption=Error Response Format]
+{
+  "success": false,
+  "error": {
+    "code": "VALIDATION_ERROR",
+    "message": "Validation failed",
+    "details": [
+      {
+        "field": "email",
+        "message": "Email is required"
+      }
+    ]
+  }
+}
+\end{lstlisting}
+
+\subsection{Recovery Mechanisms}
+
+\begin{itemize}
+    \item Automatic retry for transient failures
+    \item Graceful degradation for non-critical features
+    \item User-friendly error messages
+    \item Logging for debugging and monitoring
+\end{itemize}
+
+This workflow documentation provides a comprehensive overview of how data flows through the Campus-Sync platform and how various processes are executed, ensuring a clear understanding of system operations for developers, administrators, and stakeholders.
