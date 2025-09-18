@@ -17,7 +17,7 @@
 CampusSync is a modern, comprehensive educational management platform designed by **Mausam Kar** to streamline academic operations for students, teachers, and administrators. Built with cutting-edge technologies, it provides a unified solution for managing all aspects of campus life.
 
 **Developer**: Mausam Kar
-**Live Demo**: https://campus-sync-seven.vercel.app/auth
+**Live Demo**: https://campus-sync-frontend-three.vercel.app/
 
 ## ✨ Key Features
 
@@ -223,7 +223,7 @@ npm run build
 ## 🎨 Editing Your Application
 
 ### Using the Deployed Application (Recommended)
-Simply visit [CampusSync](https://campus-sync-seven.vercel.app/auth) to access the live application.
+Simply visit [CampusSync](https://campus-sync-frontend-three.vercel.app/) to access the live application.
 
 ### Using Your Preferred IDE
 You can clone this repo and push changes.
@@ -237,7 +237,7 @@ You can clone this repo and push changes.
 
 ### Vercel Deployment
 The application is deployed on Vercel and can be accessed at:
-[https://campus-sync-seven.vercel.app/auth](https://campus-sync-seven.vercel.app/auth)
+[https://campus-sync-seven.vercel.app/auth](https://campus-sync-frontend-three.vercel.app/)
 
 ### Custom Domain
 To connect a custom domain:
