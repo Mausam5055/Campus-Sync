@@ -155,7 +155,8 @@ Question: ${message}`
     setIsLoading(true)
 
     try {
-      const GEMINI_API_KEY = 'AIzaSyAW7Hle7YZLhvA6tanEE6gIf2DurAJ8OZQ'
+      // Use environment variable for API key
+      const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'YOUR_API_KEY_HERE'
       
       // Call Gemini API directly
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
