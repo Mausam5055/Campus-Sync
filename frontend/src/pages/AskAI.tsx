@@ -158,6 +158,11 @@ Question: ${message}`
       // Use environment variable for API key
       const GEMINI_API_KEY = import.meta.env.VITE_GEMINI_API_KEY || 'YOUR_API_KEY_HERE'
       
+      // Check if API key is properly configured
+      if (!GEMINI_API_KEY || GEMINI_API_KEY === 'YOUR_API_KEY_HERE') {
+        throw new Error('Gemini API key is not configured. Please add your API key to the .env.local file.')
+      }
+      
       // Call Gemini API directly
       const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${GEMINI_API_KEY}`, {
         method: 'POST',
@@ -180,7 +185,9 @@ Question: ${message}`
       })
 
       if (!response.ok) {
-        throw new Error('Failed to get response from Gemini API')
+        const errorText = await response.text()
+        console.error('Gemini API error response:', errorText)
+        throw new Error(`Failed to get response from Gemini API. Status: ${response.status}. ${errorText}`)
       }
 
       const data = await response.json()
@@ -201,7 +208,7 @@ Question: ${message}`
       console.error('Error generating response:', error)
       toast({
         title: "Error",
-        description: "Failed to get response from AI. Please try again.",
+        description: error instanceof Error ? error.message : "Failed to get response from AI. Please try again.",
         variant: "destructive",
       })
     } finally {
